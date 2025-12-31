@@ -1,0 +1,216 @@
+
+import React, { useState } from 'react';
+import { Habit } from '../types';
+import { motion, LayoutGroup, AnimatePresence } from 'framer-motion';
+
+interface HomeProps {
+  habits: Habit[];
+  onCheckIn: (id: string, mood?: string) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
+  const [showMoodModal, setShowMoodModal] = useState<string | null>(null);
+  const [moodText, setMoodText] = useState('');
+
+  const mainHabit = habits.find(h => h.isMain);
+  const secondaryHabits = habits.filter(h => !h.isMain);
+
+  const calculateStreak = (logs: { date: string }[]) => {
+    if (logs.length === 0) return 0;
+    const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date));
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    
+    if (sorted[0].date !== today && sorted[0].date !== yesterday) return 0;
+    
+    let streak = 0;
+    let checkDate = new Date(sorted[0].date);
+    
+    // We need to iterate carefully. Convert sorted log dates to a set for O(1) lookup
+    const logDates = new Set(logs.map(l => l.date));
+    let current = new Date(sorted[0].date);
+    
+    while (logDates.has(current.toISOString().split('T')[0])) {
+      streak++;
+      current.setDate(current.getDate() - 1);
+    }
+    return streak;
+  };
+
+  const isLoggedToday = (logs: { date: string }[]) => {
+    const today = new Date().toISOString().split('T')[0];
+    return logs.some(l => l.date === today);
+  };
+
+  const handleCheckInAttempt = (habitId: string) => {
+    setShowMoodModal(habitId);
+  };
+
+  const submitCheckIn = () => {
+    if (showMoodModal) {
+      onCheckIn(showMoodModal, moodText);
+      setShowMoodModal(null);
+      setMoodText('');
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <header className="space-y-1 px-1">
+        <p className="text-xs uppercase tracking-widest text-[#726C62] font-medium">
+          {new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())}
+        </p>
+        <h1 className="text-3xl font-serif italic text-[#413A2C]">
+          {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date())}
+        </h1>
+      </header>
+
+      <LayoutGroup>
+        <motion.div layout>
+          {mainHabit ? (
+            <section className="relative group">
+              <motion.div 
+                layoutId="main-habit-card"
+                className="bg-[#FCFBFC] border border-[#DBDCD7] rounded-[28px] p-8 space-y-6 paper-shadow transition-transform hover:-translate-y-1 duration-500"
+              >
+                <div className="flex justify-between items-start">
+                  <span className="text-4xl">{mainHabit.icon}</span>
+                  <span className="text-xs bg-[#E9E8E2] text-[#726C62] px-3 py-1 rounded-full uppercase tracking-wider font-bold">Main Focus</span>
+                </div>
+                
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-serif text-[#413A2C]">{mainHabit.title}</h2>
+                  <p className="text-[#726C62] text-sm">{mainHabit.description}</p>
+                </div>
+
+                <div className="flex items-baseline gap-2">
+                  <span className="text-7xl font-serif text-[#413A2C]">{calculateStreak(mainHabit.logs)}</span>
+                  <span className="text-[#726C62] font-medium tracking-wide uppercase text-sm">Days Streak</span>
+                </div>
+
+                <motion.button
+                  layout
+                  onClick={() => handleCheckInAttempt(mainHabit.id)}
+                  disabled={isLoggedToday(mainHabit.logs)}
+                  className={`
+                    w-full py-4 rounded-2xl font-semibold tracking-wide uppercase text-sm transition-all duration-300
+                    ${isLoggedToday(mainHabit.logs)
+                      ? 'bg-[#A3BB96]/20 text-[#66AB71] cursor-default'
+                      : 'bg-[#66AB71] text-white hover:bg-[#549856] shadow-lg shadow-[#66AB71]/20 active:scale-95'}
+                  `}
+                >
+                  {isLoggedToday(mainHabit.logs) ? '✓ Completed for today' : 'Check In Now'}
+                </motion.button>
+              </motion.div>
+            </section>
+          ) : (
+            <motion.section layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
+              <div className="bg-[#FCFBFC] border border-[#DBDCD7] border-dashed rounded-[28px] p-12 flex flex-col items-center justify-center text-center space-y-6 paper-shadow">
+                <div className="w-24 h-24 bg-[#E9E8E2]/50 rounded-full flex items-center justify-center text-5xl opacity-60">
+                  🍃
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-serif text-[#413A2C] italic">No main focus yet</h2>
+                  <p className="text-[#726C62] text-sm max-w-[200px] mx-auto">
+                    Select a primary habit in the records tab to track your main journey here.
+                  </p>
+                </div>
+              </div>
+            </motion.section>
+          )}
+        </motion.div>
+      </LayoutGroup>
+
+      <section className="space-y-4">
+        <h3 className="text-xs uppercase tracking-widest text-[#726C62] font-bold px-1">Other Journeys</h3>
+        <div className="grid gap-4">
+          <AnimatePresence mode="popLayout">
+            {secondaryHabits.length > 0 ? secondaryHabits.map((habit) => (
+              <motion.div 
+                key={habit.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-[#FCFBFC] border border-[#DBDCD7] rounded-2xl p-4 flex items-center justify-between paper-shadow transition-transform hover:-translate-y-0.5 duration-300"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl">{habit.icon}</span>
+                  <div>
+                    <h4 className="font-medium text-[#413A2C]">{habit.title}</h4>
+                    <p className="text-[10px] text-[#726C62] uppercase tracking-wider">{calculateStreak(habit.logs)} Day Streak</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleCheckInAttempt(habit.id)}
+                  className={`
+                    w-10 h-10 rounded-full flex items-center justify-center transition-all
+                    ${isLoggedToday(habit.logs)
+                      ? 'bg-[#66AB71] text-white'
+                      : 'bg-[#E9E8E2] text-[#726C62] hover:bg-[#DBDCD7]'}
+                  `}
+                >
+                  {isLoggedToday(habit.logs) ? '✓' : '+'}
+                </button>
+              </motion.div>
+            )) : (
+              <motion.div 
+                layout
+                className="p-8 text-center border border-[#DBDCD7] rounded-2xl bg-[#FCFBFC]/30 italic text-[#726C62] text-sm"
+              >
+                Your side journeys will appear here.
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </section>
+
+      {/* Mood Entry Modal */}
+      <AnimatePresence>
+        {showMoodModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[200] flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#FCFBFC] w-full max-w-sm rounded-[28px] p-8 space-y-6 paper-shadow border border-[#DBDCD7]"
+            >
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-serif text-[#413A2C] italic">How are you feeling?</h2>
+                <p className="text-sm text-[#726C62]">Record a brief note for today's journey.</p>
+              </div>
+              <textarea 
+                autoFocus
+                value={moodText}
+                onChange={e => setMoodText(e.target.value)}
+                placeholder="Today was..."
+                className="w-full h-32 bg-[#E9E8E2]/50 border-none rounded-2xl px-4 py-3 focus:ring-2 focus:ring-[#66AB71]/20 outline-none text-[#413A2C] resize-none text-sm leading-relaxed"
+              />
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => { setShowMoodModal(null); setMoodText(''); }}
+                  className="flex-1 py-3 text-[#726C62] font-semibold text-sm uppercase tracking-wider"
+                >
+                  Skip
+                </button>
+                <button 
+                  onClick={submitCheckIn}
+                  className="flex-1 py-3 bg-[#66AB71] text-white rounded-xl font-semibold text-sm uppercase tracking-wider shadow-lg shadow-[#66AB71]/20"
+                >
+                  Check In
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default Home;
