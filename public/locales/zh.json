@@ -15,7 +15,7 @@
         "skip": "跳过",
         "check-in": "打卡",
         "edit-capsule": "编辑时光胶囊",
-        "update-manifestation": "更新你的显化目标。",
+        "update-manifestation": "更新你的目标。",
         "title": "标题",
         "objective": "目标内容",
         "objective-placeholder": "简短的描述...",
@@ -35,7 +35,7 @@
         "journey-description-placeholder": "简短的目标...",
         "cancel": "取消",
         "create": "创建",
-        "journey-progress": "旅程进展",
+        "journey-progress": "目标进展",
         "total-check-ins": "累计打卡",
         "close": "关闭"
     },
@@ -49,7 +49,7 @@
     "settings": {
         "title": "设置",
         "widgets": "小组件",
-        "heatmap": "活跃热力图",
+        "heatmap": "热力图",
         "heatmap-desc": "显示最近30天的活动频率。",
         "daily-quote": "每日一言",
         "daily-quote-desc": "来自 Hitokoto 的启发之语。",
@@ -69,7 +69,7 @@
         "app-tagline": "纸上的正念坚持。",
         "version": "版本",
         "repository": "源码仓库",
-        "quote-footer": "等待沉淀，等待徘徊，等待逝去，直到那不再是一个遗憾。"
+        "quote-footer": "静候一场沉淀、驻足、与弥散，直至遗憾，皆成释然。"
     },
     "webdav": {
         "title": "WebDAV 备份",
@@ -105,7 +105,7 @@
     },
     "widgets": {
         "heatmap-title": "最近30天",
-        "heatmap-subtitle": "坚毅热力图",
+        "heatmap-subtitle": "热力图",
         "quote-loading": "正在寻求智慧...",
         "days": "天",
         "hours": "小时"
