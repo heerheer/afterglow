@@ -1,4 +1,3 @@
-
 export interface HabitLog {
   date: string; // YYYY-MM-DD
   mood?: string;
@@ -16,3 +15,14 @@ export interface Habit {
 }
 
 export type TabType = 'home' | 'records' | 'settings';
+
+export interface WidgetConfig {
+  heatmap: boolean;
+  quote: boolean;
+  capsule: {
+    enabled: boolean;
+    title: string;
+    description?: string;
+    targetDate: string;
+  };
+}

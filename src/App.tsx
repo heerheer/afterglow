@@ -140,7 +140,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex flex-col items-center justify-center h-full space-y-4 pt-20">
+        <div className="flex flex-col items-center justify-center h-full space-y-4 py-20">
           <div className="w-10 h-10 border-4 border-[#A3BB96] border-t-transparent rounded-full animate-spin" />
           <p className="text-[#A3BB96] font-medium animate-pulse text-sm tracking-widest uppercase">Initializing Tracker</p>
         </div>

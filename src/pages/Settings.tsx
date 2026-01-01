@@ -1,156 +1,146 @@
 
 import React, { useState, useEffect } from 'react';
-import { Habit } from '../types';
-import { backupToWebDAV, restoreFromWebDAV, WebDAVConfig } from '../utils/webdav';
-import { saveAllHabits, clearAllDB } from '../db';
+import { Habit, WidgetConfig } from '../types';
+import WebDAVSettings from '../components/webdav/WebDAVSettings';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SettingsProps {
   habits: Habit[];
   onRefresh: () => Promise<void>;
 }
 
-const WEBDAV_STORAGE_KEY = 'tracker_webdav_config';
+const WIDGET_STORAGE_KEY = 'tracker_widget_config';
+
+const DEFAULT_WIDGET_CONFIG: WidgetConfig = {
+  heatmap: false,
+  quote: false,
+  capsule: {
+    enabled: false,
+    title: 'Countdown',
+    description: '',
+    targetDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+  },
+};
 
 const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
-  const [config, setConfig] = useState<WebDAVConfig>({
-    url: '',
-    username: '',
-    password: '',
-  });
-  const [status, setStatus] = useState<{ type: 'success' | 'error' | 'loading' | null; message: string }>({
-    type: null,
-    message: '',
-  });
+  const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>(DEFAULT_WIDGET_CONFIG);
 
   useEffect(() => {
-    const savedConfig = localStorage.getItem(WEBDAV_STORAGE_KEY);
-    if (savedConfig) {
+    const savedWidgetConfig = localStorage.getItem(WIDGET_STORAGE_KEY);
+    if (savedWidgetConfig) {
       try {
-        setConfig(JSON.parse(savedConfig));
+        setWidgetConfig(JSON.parse(savedWidgetConfig));
       } catch (e) {
-        console.error('Failed to parse WebDAV config', e);
+        console.error('Failed to parse Widget config', e);
       }
     }
   }, []);
 
-  const handleSaveConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const newConfig = { ...config, [name]: value };
-    setConfig(newConfig);
-    localStorage.setItem(WEBDAV_STORAGE_KEY, JSON.stringify(newConfig));
-  };
-
-  const handleBackup = async () => {
-    if (!config.url || !config.username || !config.password) {
-      setStatus({ type: 'error', message: 'Please fill in all WebDAV fields.' });
-      return;
-    }
-
-    setStatus({ type: 'loading', message: 'Backing up...' });
-    try {
-      await backupToWebDAV(config, habits);
-      setStatus({ type: 'success', message: 'Backup successful!' });
-    } catch (error: any) {
-      setStatus({ type: 'error', message: error.message || 'Backup failed.' });
-    }
-  };
-
-  const handleRestore = async () => {
-    if (!config.url || !config.username || !config.password) {
-      setStatus({ type: 'error', message: 'Please fill in all WebDAV fields.' });
-      return;
-    }
-
-    if (!confirm('This will overwrite all local data. Are you sure?')) {
-      return;
-    }
-
-    setStatus({ type: 'loading', message: 'Restoring...' });
-    try {
-      const restoredHabits = await restoreFromWebDAV(config);
-      await clearAllDB();
-      await saveAllHabits(restoredHabits);
-      await onRefresh();
-      setStatus({ type: 'success', message: 'Restore successful!' });
-    } catch (error: any) {
-      setStatus({ type: 'error', message: error.message || 'Restore failed.' });
-    }
+  const handleSaveWidgetConfig = (newConfig: WidgetConfig) => {
+    setWidgetConfig(newConfig);
+    localStorage.setItem(WIDGET_STORAGE_KEY, JSON.stringify(newConfig));
   };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-8">
       <h1 className="text-3xl font-serif italic text-[#413A2C]">Settings</h1>
 
+      <WebDAVSettings habits={habits} onRefresh={onRefresh} />
+
       <div className="bg-[#FCFBFC] border border-[#DBDCD7] rounded-[28px] p-8 paper-shadow space-y-6">
         <div className="flex items-center gap-3 border-b border-[#DBDCD7] pb-4">
-          <div className="text-xl">☁️</div>
-          <h2 className="text-lg font-serif text-[#413A2C]">WebDAV Backup</h2>
+          <div className="text-xl">🧩</div>
+          <h2 className="text-lg font-serif text-[#413A2C]">Widgets</h2>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Server URL</label>
-            <input
-              type="text"
-              name="url"
-              value={config.url}
-              onChange={handleSaveConfig}
-              placeholder="https://example.com/dav"
-              className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Username</label>
-              <input
-                type="text"
-                name="username"
-                value={config.username}
-                onChange={handleSaveConfig}
-                className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
-              />
+              <h3 className="text-sm font-serif text-[#413A2C]">Heatmap</h3>
+              <p className="text-[10px] text-[#726C62]">Display 30-day activity consistency.</p>
             </div>
+            <button
+              onClick={() => handleSaveWidgetConfig({ ...widgetConfig, heatmap: !widgetConfig.heatmap })}
+              className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${widgetConfig.heatmap ? 'bg-[#66AB71]' : 'bg-[#E9E8E2]'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 ${widgetConfig.heatmap ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={config.password}
-                onChange={handleSaveConfig}
-                className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
-              />
+              <h3 className="text-sm font-serif text-[#413A2C]">Daily Quote</h3>
+              <p className="text-[10px] text-[#726C62]">Inspiring word from Hitokoto API.</p>
             </div>
+            <button
+              onClick={() => handleSaveWidgetConfig({ ...widgetConfig, quote: !widgetConfig.quote })}
+              className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${widgetConfig.quote ? 'bg-[#66AB71]' : 'bg-[#E9E8E2]'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 ${widgetConfig.quote ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="text-sm font-serif text-[#413A2C]">Future Capsule</h3>
+                <p className="text-[10px] text-[#726C62]">Countdown to a special moment.</p>
+              </div>
+              <button
+                onClick={() => handleSaveWidgetConfig({
+                  ...widgetConfig,
+                  capsule: { ...widgetConfig.capsule, enabled: !widgetConfig.capsule.enabled }
+                })}
+                className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${widgetConfig.capsule.enabled ? 'bg-[#66AB71]' : 'bg-[#E9E8E2]'}`}
+              >
+                <div className={`w-4 h-4 bg-white rounded-full transition-transform duration-300 ${widgetConfig.capsule.enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            {widgetConfig.capsule.enabled && (
+              <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Title</label>
+                  <input
+                    type="text"
+                    value={widgetConfig.capsule.title}
+                    onChange={(e) => handleSaveWidgetConfig({
+                      ...widgetConfig,
+                      capsule: { ...widgetConfig.capsule, title: e.target.value }
+                    })}
+                    placeholder="Event Title"
+                    className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Target Date</label>
+                  <input
+                    type="date"
+                    value={widgetConfig.capsule.targetDate}
+                    onChange={(e) => handleSaveWidgetConfig({
+                      ...widgetConfig,
+                      capsule: { ...widgetConfig.capsule, targetDate: e.target.value }
+                    })}
+                    className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
+                  />
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-medium ml-1">Description</label>
+                  <input
+                    type="text"
+                    value={widgetConfig.capsule.description}
+                    onChange={(e) => handleSaveWidgetConfig({
+                      ...widgetConfig,
+                      capsule: { ...widgetConfig.capsule, description: e.target.value }
+                    })}
+                    placeholder="Brief objective (optional)"
+                    className="w-full bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#66AB71] transition-all"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-4 pt-2">
-          <button
-            onClick={handleBackup}
-            disabled={status.type === 'loading'}
-            className="bg-[#66AB71] text-white py-3 rounded-xl text-sm font-medium hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 paper-shadow"
-          >
-            Backup Now
-          </button>
-          <button
-            onClick={handleRestore}
-            disabled={status.type === 'loading'}
-            className="border border-[#66AB71] text-[#66AB71] py-3 rounded-xl text-sm font-medium hover:bg-[#66AB71]/5 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100"
-          >
-            Restore Now
-          </button>
-        </div>
-
-        {status.message && (
-          <div className={`text-center py-2 px-4 rounded-lg text-xs font-medium animate-in zoom-in-95 duration-300 ${status.type === 'success' ? 'bg-[#66AB71]/10 text-[#66AB71]' :
-            status.type === 'error' ? 'bg-red-50 text-red-500' : 'bg-[#E9E8E2]/50 text-[#726C62]'
-            }`}>
-            {status.message}
-          </div>
-        )}
-
-        <p className="text-[10px] text-[#726C62] text-center italic">
-          Files will be backed up to the <code className="bg-[#E9E8E2] px-1 rounded">/tracker</code> directory.
-        </p>
       </div>
 
       <div className="bg-[#FCFBFC] border border-[#DBDCD7] rounded-[28px] p-8 paper-shadow space-y-8">
