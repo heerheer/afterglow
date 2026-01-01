@@ -51,12 +51,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onToggle, onUpdateMoo
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#FCFBFC] rounded-2xl p-4 border border-[#DBDCD7]/50 shadow-sm">
+      <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm">
         <div className="flex justify-between items-center px-1 mb-4">
-          <h4 className="text-sm font-serif italic text-[#413A2C]">{monthName}</h4>
+          <h4 className="text-sm font-serif italic text-foreground">{monthName}</h4>
           <div className="flex gap-4">
-            <button onClick={prevMonth} className="text-[#726C62] hover:text-[#413A2C] text-lg font-bold">‹</button>
-            <button onClick={nextMonth} className="text-[#726C62] hover:text-[#413A2C] text-lg font-bold">›</button>
+            <button onClick={prevMonth} className="text-muted-foreground hover:text-foreground text-lg font-bold">‹</button>
+            <button onClick={nextMonth} className="text-muted-foreground hover:text-foreground text-lg font-bold">›</button>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onToggle, onUpdateMoo
             t('calendar.weekdays.sat'),
             t('calendar.weekdays.sun')
           ].map((d, i) => (
-            <div key={i} className="text-[10px] text-center font-bold text-[#726C62] mb-1 opacity-50">{d}</div>
+            <div key={i} className="text-[10px] text-center font-bold text-muted-foreground mb-1 opacity-50">{d}</div>
           ))}
           {days.map((day, i) => {
             if (day === null) return <div key={i} />;
@@ -86,10 +86,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onToggle, onUpdateMoo
                 className={`
                   aspect-square rounded-full flex flex-col items-center justify-center text-[11px] transition-all relative
                   ${active
-                    ? 'bg-[#66AB71] text-white'
-                    : 'bg-transparent text-[#413A2C] hover:bg-[#E9E8E2]'}
-                  ${isSelected ? 'ring-2 ring-[#413A2C] ring-offset-2 scale-110 z-10' : ''}
-                  ${isToday && !active ? 'border border-[#66AB71] text-[#66AB71]' : ''}
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-transparent text-foreground hover:bg-secondary'}
+                  ${isSelected ? 'ring-2 ring-foreground ring-offset-2 scale-110 z-10' : ''}
+                  ${isToday && !active ? 'border border-primary text-primary' : ''}
                 `}
               >
                 {day}
@@ -106,13 +106,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onToggle, onUpdateMoo
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="bg-[#E9E8E2]/30 border border-[#DBDCD7] rounded-2xl p-4 space-y-4"
+          className="bg-secondary/30 border border-border rounded-2xl p-4 space-y-4"
         >
           <div className="flex justify-between items-center">
-            <p className="text-[10px] uppercase tracking-widest font-bold text-[#726C62]">
+            <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
               {new Intl.DateTimeFormat(getSafeLanguage(i18n.language), { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(selectedDate))}
             </p>
-            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${isChecked ? 'bg-[#66AB71]/10 text-[#66AB71]' : 'bg-[#726C62]/10 text-[#726C62]'}`}>
+            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${isChecked ? 'bg-primary/10 text-primary' : 'bg-muted-foreground/10 text-muted-foreground'}`}>
               {isChecked ? t('calendar.completed') : t('calendar.skipped')}
             </span>
           </div>
@@ -123,21 +123,21 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onToggle, onUpdateMoo
                 value={selectedLog?.mood || ''}
                 onChange={handleMoodChange}
                 placeholder={t('calendar.mood-placeholder')}
-                className="w-full bg-white/50 border-none rounded-xl px-4 py-3 text-sm text-[#413A2C] focus:ring-2 focus:ring-[#66AB71]/20 outline-none resize-none min-h-[80px]"
+                className="w-full bg-card/50 border-none rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 outline-none resize-none min-h-[80px]"
               />
               <button
                 onClick={() => onToggle(selectedDate)}
-                className="w-full py-2 bg-[#DBDCD7] text-[#726C62] text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-red-50 hover:text-red-400 transition-colors"
+                className="w-full py-2 bg-border text-muted-foreground text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors"
               >
                 {t('calendar.clear-record')}
               </button>
             </div>
           ) : (
             <div className="py-2 text-center space-y-4">
-              <p className="text-xs text-[#726C62] italic">{t('calendar.no-entry')}</p>
+              <p className="text-xs text-muted-foreground italic">{t('calendar.no-entry')}</p>
               <button
                 onClick={() => onToggle(selectedDate, "")}
-                className="w-full py-3 bg-[#66AB71] text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-md shadow-[#66AB71]/10 hover:bg-[#549856] transition-all"
+                className="w-full py-3 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-xl shadow-md shadow-primary/10 hover:bg-primary/90 transition-all"
               >
                 {t('calendar.add-record')}
               </button>

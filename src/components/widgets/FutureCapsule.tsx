@@ -29,7 +29,7 @@ const FutureCapsule: React.FC<FutureCapsuleProps> = ({ title, description, targe
     return (
         <section
             onClick={onEdit}
-            className="bg-[#66AB71] rounded-[28px] p-8 paper-shadow text-white relative overflow-hidden group cursor-pointer active:scale-95 transition-transform duration-300"
+            className="bg-primary rounded-[28px] p-8 paper-shadow text-primary-foreground relative overflow-hidden group cursor-pointer active:scale-95 transition-transform duration-300"
         >
             <div className="absolute top-0 right-0 p-4 opacity-20 text-4xl transform rotate-12 group-hover:scale-110 transition-transform duration-500">⏳</div>
             <div className="relative z-10 space-y-4">

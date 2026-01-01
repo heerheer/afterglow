@@ -52,10 +52,10 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center px-1">
-        <h1 className="text-3xl font-serif italic text-[#413A2C]">{t('records.title')}</h1>
+        <h1 className="text-3xl font-serif italic text-foreground">{t('records.title')}</h1>
         <button
           onClick={() => setIsAddOpen(true)}
-          className="bg-[#66AB71] text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#549856] transition-colors paper-shadow"
+          className="bg-primary text-primary-foreground w-10 h-10 rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors paper-shadow"
         >
           +
         </button>
@@ -72,24 +72,24 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
               exit={{ opacity: 0, scale: 0.98 }}
               onClick={() => setSelectedHabitId(habit.id)}
               className={`
-                bg-[#FCFBFC] border border-[#DBDCD7] rounded-[24px] p-6 space-y-4 paper-shadow 
-                cursor-pointer transition-all hover:border-[#66AB71] group
-                ${habit.isMain ? 'ring-2 ring-[#66AB71]/20 border-[#66AB71]' : ''}
+                bg-card border border-border rounded-[24px] p-6 space-y-4 paper-shadow 
+                cursor-pointer transition-all hover:border-primary group
+                ${habit.isMain ? 'ring-2 ring-primary/20 border-primary' : ''}
               `}
             >
               <div className="flex justify-between items-start">
                 <div className="flex gap-4">
-                  <span className="text-3xl bg-[#E9E8E2] w-12 h-12 flex items-center justify-center rounded-xl">{habit.icon}</span>
+                  <span className="text-3xl bg-secondary w-12 h-12 flex items-center justify-center rounded-xl">{habit.icon}</span>
                   <div>
-                    <h3 className="font-semibold text-[#413A2C]">{habit.title}</h3>
-                    <p className="text-xs text-[#726C62] line-clamp-1">{habit.description}</p>
+                    <h3 className="font-semibold text-foreground">{habit.title}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{habit.description}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   {!habit.isMain && (
                     <button
                       onClick={(e) => { e.stopPropagation(); onSetMain(habit.id); }}
-                      className="text-[10px] uppercase font-bold text-[#66AB71] hover:underline"
+                      className="text-[10px] uppercase font-bold text-primary hover:underline"
                     >
                       {t('records.set-main')}
                     </button>
@@ -112,7 +112,7 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
                   return (
                     <div
                       key={i}
-                      className={`h-1.5 flex-1 rounded-full ${active ? 'bg-[#66AB71]' : 'bg-[#E9E8E2]'}`}
+                      className={`h-1.5 flex-1 rounded-full ${active ? 'bg-primary' : 'bg-secondary'}`}
                     />
                   );
                 })}
@@ -135,37 +135,37 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#FCFBFC] w-full max-w-sm rounded-[28px] p-8 space-y-6 paper-shadow border border-[#DBDCD7] max-h-[85vh] overflow-y-auto custom-scroll"
+              className="bg-card w-full max-w-sm rounded-[28px] p-8 space-y-6 paper-shadow border border-border max-h-[85vh] overflow-y-auto custom-scroll"
             >
-              <h2 className="text-2xl font-serif text-[#413A2C] italic text-center">{t('records.new-journey')}</h2>
+              <h2 className="text-2xl font-serif text-foreground italic text-center">{t('records.new-journey')}</h2>
               <form onSubmit={handleAdd} className="space-y-6">
 
                 {/* Icon Selection Section */}
                 <div className="space-y-3">
                   <div className="flex justify-between items-end">
-                    <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-bold">{t('records.icon')}</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('records.icon')}</label>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-[#726C62] font-medium italic">{t('records.custom')}</span>
+                      <span className="text-[10px] text-muted-foreground font-medium italic">{t('records.custom')}</span>
                       <input
                         maxLength={2}
                         value={newIcon}
                         onChange={e => setNewIcon(e.target.value)}
-                        className="w-10 h-8 text-center bg-[#E9E8E2] border-none rounded-lg text-lg focus:ring-1 focus:ring-[#66AB71]"
+                        className="w-10 h-8 text-center bg-secondary border-none rounded-lg text-lg focus:ring-1 focus:ring-primary"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-4 bg-[#E9E8E2]/30 p-4 rounded-[20px] max-h-60 overflow-y-auto custom-scroll border border-[#DBDCD7]">
+                  <div className="space-y-4 bg-secondary/30 p-4 rounded-[20px] max-h-60 overflow-y-auto custom-scroll border border-border">
                     {EMOJI_CATEGORIES.map(cat => (
                       <div key={cat.name} className="space-y-2">
-                        <p className="text-[9px] uppercase tracking-wider text-[#726C62] font-bold opacity-70">{t(`categories.${cat.name}`)}</p>
+                        <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-bold opacity-70">{t(`categories.${cat.name}`)}</p>
                         <div className="grid grid-cols-7 gap-1">
                           {cat.icons.map(icon => (
                             <button
                               key={icon}
                               type="button"
                               onClick={() => setNewIcon(icon)}
-                              className={`aspect-square rounded-lg flex items-center justify-center text-lg transition-all ${newIcon === icon ? 'bg-[#66AB71] text-white scale-110' : 'bg-[#FCFBFC] text-[#413A2C] hover:bg-[#DBDCD7]'}`}
+                              className={`aspect-square rounded-lg flex items-center justify-center text-lg transition-all ${newIcon === icon ? 'bg-primary text-primary-foreground scale-110' : 'bg-card text-foreground hover:bg-border'}`}
                             >
                               {icon}
                             </button>
@@ -177,21 +177,21 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-bold">{t('records.journey-title')}</label>
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('records.journey-title')}</label>
                   <input
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
-                    className="w-full bg-[#E9E8E2]/50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#66AB71]/20 outline-none text-[#413A2C]"
+                    className="w-full bg-secondary/50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                     placeholder={t('records.journey-title-placeholder')}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest text-[#726C62] font-bold">{t('records.journey-description')}</label>
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('records.journey-description')}</label>
                   <input
                     value={newDesc}
                     onChange={e => setNewDesc(e.target.value)}
-                    className="w-full bg-[#E9E8E2]/50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#66AB71]/20 outline-none text-[#413A2C]"
+                    className="w-full bg-secondary/50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                     placeholder={t('records.journey-description-placeholder')}
                   />
                 </div>
@@ -200,13 +200,13 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
                   <button
                     type="button"
                     onClick={() => setIsAddOpen(false)}
-                    className="flex-1 py-3 text-[#726C62] font-semibold text-sm uppercase tracking-wider"
+                    className="flex-1 py-3 text-muted-foreground font-semibold text-sm uppercase tracking-wider"
                   >
                     {t('records.cancel')}
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[#66AB71] text-white rounded-xl font-semibold text-sm uppercase tracking-wider shadow-lg shadow-[#66AB71]/20"
+                    className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm uppercase tracking-wider shadow-lg shadow-primary/20"
                   >
                     {t('records.create')}
                   </button>
@@ -230,18 +230,18 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#FCFBFC] w-full max-w-sm rounded-[28px] p-6 space-y-6 paper-shadow border border-[#DBDCD7] relative max-h-[90vh] overflow-y-auto custom-scroll"
+              className="bg-card w-full max-w-sm rounded-[28px] p-6 space-y-6 paper-shadow border border-border relative max-h-[90vh] overflow-y-auto custom-scroll"
             >
               <button
                 onClick={() => setSelectedHabitId(null)}
-                className="absolute top-6 right-6 text-[#726C62] hover:text-[#413A2C] z-10"
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground z-10"
               >
                 ✕
               </button>
               <div className="text-center space-y-2">
                 <span className="text-4xl block">{selectedHabit.icon}</span>
-                <h2 className="text-2xl font-serif text-[#413A2C]">{selectedHabit.title}</h2>
-                <p className="text-sm text-[#726C62] italic px-4">{selectedHabit.description}</p>
+                <h2 className="text-2xl font-serif text-foreground">{selectedHabit.title}</h2>
+                <p className="text-sm text-muted-foreground italic px-4">{selectedHabit.description}</p>
               </div>
 
               <CalendarView
@@ -250,14 +250,14 @@ const Records: React.FC<RecordsProps> = ({ habits, onDelete, onSetMain, onAdd, o
                 onUpdateMood={(date, mood) => onUpdateMood(selectedHabit.id, date, mood)}
               />
 
-              <div className="pt-4 border-t border-[#DBDCD7] flex justify-between items-center">
+              <div className="pt-4 border-t border-border flex justify-between items-center">
                 <div className="text-left">
-                  <p className="text-[10px] uppercase text-[#726C62] tracking-widest font-bold">{t('records.journey-progress')}</p>
+                  <p className="text-[10px] uppercase text-muted-foreground tracking-widest font-bold">{t('records.journey-progress')}</p>
                   <p className="text-xl font-serif">{selectedHabit.logs.length} {t('records.total-check-ins')}</p>
                 </div>
                 <button
                   onClick={() => setSelectedHabitId(null)}
-                  className="bg-[#E9E8E2] text-[#413A2C] px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#DBDCD7] transition-colors"
+                  className="bg-secondary text-foreground px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-border transition-colors"
                 >
                   {t('records.close')}
                 </button>

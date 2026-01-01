@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { getAllHabits, saveAllHabits, deleteHabitFromDB } from './db';
 import { useTranslation } from 'react-i18next';
 
+
+
 const STORAGE_KEY = 'ethereal_habits_v1_moods';
 
 const INITIAL_HABITS: Habit[] = [
@@ -142,8 +144,8 @@ const App: React.FC = () => {
     if (loading) {
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-4 py-20">
-          <div className="w-10 h-10 border-4 border-[#A3BB96] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#A3BB96] font-medium animate-pulse text-sm tracking-widest uppercase">{t('app.initializing')}</p>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-primary font-medium animate-pulse text-sm tracking-widest uppercase">{t('app.initializing')}</p>
         </div>
       );
     }

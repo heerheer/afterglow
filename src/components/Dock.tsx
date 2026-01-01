@@ -17,7 +17,7 @@ const Dock: React.FC<DockProps> = ({ activeTab, setActiveTab }) => {
 
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
-      <nav className="bg-[#FCFBFC]/90 backdrop-blur-xl border border-[#DBDCD7] rounded-full p-2 flex items-center gap-3 paper-shadow">
+      <nav className="bg-card/90 backdrop-blur-xl border border-border rounded-full p-2 flex items-center gap-3 paper-shadow">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -26,8 +26,8 @@ const Dock: React.FC<DockProps> = ({ activeTab, setActiveTab }) => {
             className={`
               relative w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 ease-out
               ${activeTab === tab.id
-                ? 'bg-[#66AB71] text-white shadow-lg shadow-[#66AB71]/30 scale-110'
-                : 'text-[#726C62] hover:bg-[#E9E8E2] hover:text-[#413A2C]'}
+                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110'
+                : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}
             `}
           >
             <span className="text-xl leading-none">{tab.icon}</span>
