@@ -187,7 +187,7 @@ const App: React.FC = () => {
       <main className="flex-1 max-w-md mx-auto w-full px-6  overflow-x-hidden">
         {renderContent()}
       </main>
-      <Dock activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Dock activeTab={activeTab} setActiveTab={setActiveTab} habits={habits} />
     </div>
   );
 };

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Habit } from '../../types';
-import { backupToWebDAV, restoreFromWebDAV, listBackups, deleteBackup, WebDAVConfig } from '../../utils/webdav';
-import { saveAllHabits, clearAllDB } from '../../db';
+import { useWebDAV } from '../../hooks/useWebDAV';
 import WebDAVRestoreModal from './WebDAVRestoreModal';
 import { useTranslation, Trans } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
@@ -11,125 +10,46 @@ interface WebDAVSettingsProps {
     onRefresh: () => Promise<void>;
 }
 
-const WEBDAV_STORAGE_KEY = 'tracker_webdav_config';
-
 const WebDAVSettings: React.FC<WebDAVSettingsProps> = ({ habits, onRefresh }) => {
     const { t } = useTranslation();
-    // config
-    const [config, setConfig] = useState<WebDAVConfig>({
-        url: '',
-        username: '',
-        password: '',
-        maxBackups: 15,
-    });
-    // backup/restore status
-    const [status, setStatus] = useState<{ type: 'success' | 'error' | 'loading' | null; message: string }>({
-        type: null,
-        message: '',
-    });
-    // backups list
-    const [backups, setBackups] = useState<string[]>([]);
-    // restore modal
-    const [showRestoreModal, setShowRestoreModal] = useState(false);
+    const {
+        config,
+        status,
+        backups,
+        setStatus,
+        handleSaveConfig,
+        backup,
+        fetchBackups,
+        restore,
+        removeBackup
+    } = useWebDAV(habits, onRefresh);
 
-    // show/hidden details(ui)
+    const [showRestoreModal, setShowRestoreModal] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
 
-    useEffect(() => {
-        const savedConfig = localStorage.getItem(WEBDAV_STORAGE_KEY);
-        if (savedConfig) {
-            try {
-                setConfig(JSON.parse(savedConfig));
-            } catch (e) {
-                console.error('Failed to parse WebDAV config', e);
-            }
-        }
-    }, []);
-
-    const handleSaveConfig = (name: string, value: any) => {
-        const newConfig = { ...config, [name]: value };
-        setConfig(newConfig);
-        localStorage.setItem(WEBDAV_STORAGE_KEY, JSON.stringify(newConfig));
-    };
-
     const handleBackup = async () => {
-        if (!config.url || !config.username || !config.password) {
-            setStatus({ type: 'error', message: t('webdav.fill-all-fields') });
-            return;
-        }
-
-        setStatus({ type: 'loading', message: t('webdav.backing-up') });
-        try {
-            await backupToWebDAV(config, habits);
-            await cleanupBackups();
-            setStatus({ type: 'success', message: t('webdav.backup-success') });
-        } catch (error: any) {
-            setStatus({ type: 'error', message: error.message || t('webdav.backup-failed') });
-        }
-    };
-
-    const cleanupBackups = async () => {
-        try {
-            const list = await listBackups(config);
-            const max = config.maxBackups || 15;
-            if (list.length > max) {
-                const toDelete = list.slice(max);
-                for (const filename of toDelete) {
-                    await deleteBackup(config, filename);
-                }
-            }
-        } catch (e) {
-            console.error('Cleanup failed', e);
-        }
+        await backup();
     };
 
     const handleRestore = async () => {
-        if (!config.url || !config.username || !config.password) {
-            setStatus({ type: 'error', message: t('webdav.fill-all-fields') });
-            return;
-        }
-
-        setStatus({ type: 'loading', message: t('webdav.fetching-backups') });
-        try {
-            const list = await listBackups(config);
-            if (list.length === 0) {
-                setStatus({ type: 'error', message: t('webdav.no-backups-found') });
-                return;
-            }
-            setBackups(list);
+        const list = await fetchBackups();
+        if (list && list.length > 0) {
             setShowRestoreModal(true);
-            setStatus({ type: null, message: '' });
-        } catch (error: any) {
-            setStatus({ type: 'error', message: error.message || t('webdav.failed-to-list') });
+        } else if (list && list.length === 0) {
+            setStatus({ type: 'error', message: t('webdav.no-backups-found') });
         }
     };
 
     const executeRestore = async (filename: string) => {
         if (!confirm(t('webdav.restore-confirm', { filename }))) return;
-
         setShowRestoreModal(false);
-        setStatus({ type: 'loading', message: t('webdav.restoring') });
-        try {
-            const restoredHabits = await restoreFromWebDAV(config, filename);
-            await clearAllDB();
-            await saveAllHabits(restoredHabits);
-            await onRefresh();
-            setStatus({ type: 'success', message: t('webdav.restore-success') });
-        } catch (error: any) {
-            setStatus({ type: 'error', message: error.message || t('webdav.restore-failed') });
-        }
+        await restore(filename);
     };
 
     const executeDelete = async (filename: string) => {
-        try {
-            await deleteBackup(config, filename);
-            const newList = backups.filter(b => b !== filename);
-            setBackups(newList);
-            if (newList.length === 0) {
-                setShowRestoreModal(false);
-            }
-        } catch (error: any) {
-            alert(t('webdav.delete-failed', { message: error.message }));
+        const success = await removeBackup(filename);
+        if (success && backups.length <= 1) {
+            setShowRestoreModal(false);
         }
     };
 
