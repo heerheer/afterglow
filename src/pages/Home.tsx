@@ -15,7 +15,7 @@ interface HomeProps {
 
 const WIDGET_STORAGE_KEY = 'tracker_widget_config';
 
-const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
+const Home = ({ habits, onCheckIn }: HomeProps) => {
   const { t, i18n } = useTranslation();
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
   const [editingCapsule, setEditingCapsule] = useState(false);
@@ -78,6 +78,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
   };
 
   const handleCheckInAttempt = (habitId: string) => {
+    if (isLoggedToday(habits.find(h => h.id === habitId)?.logs || [])) return;
     setShowMoodModal(habitId);
   };
 

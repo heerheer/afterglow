@@ -61,6 +61,8 @@
         "create": "创建",
         "custom": "自定义:",
         "delete": "删除",
+        "delete-confirm": "确定要删除这个习惯吗？所有的历史记录都将被清除。",
+        "delete-confirm-title": "删除确认",
         "icon": "图标",
         "journey-description": "描述",
         "journey-description-placeholder": "简短的目标...",
@@ -69,6 +71,9 @@
         "journey-title-placeholder": "例如：每日冥想",
         "new-journey": "开启新目标",
         "set-main": "设为主目标",
+        "swipe-hint-text": "💡 试试左右滑动习惯卡片：左滑极速删除，右滑设为主目标。",
+        "swipe-left": "左滑删除",
+        "swipe-right": "右滑设为主目标",
         "title": "记录",
         "total-check-ins": "累计打卡"
     },
