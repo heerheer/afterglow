@@ -11,6 +11,21 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
   const [showMoodModal, setShowMoodModal] = useState<string | null>(null);
   const [moodText, setMoodText] = useState('');
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; emoji: string }[]>([]);
+
+  const createParticles = () => {
+    const emojis = ['✨', '🎉', '🌟', '🎊', '⭐'];
+    const newParticles = Array.from({ length: 15 }).map((_, i) => ({
+      id: Date.now() + i,
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 400 - 100,
+      emoji: emojis[Math.floor(Math.random() * emojis.length)]
+    }));
+    setParticles(prev => [...prev, ...newParticles]);
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 1000);
+  };
 
   const mainHabit = habits.find(h => h.isMain);
   const secondaryHabits = habits.filter(h => !h.isMain);
@@ -20,16 +35,16 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
     const sorted = [...logs].sort((a, b) => b.date.localeCompare(a.date));
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    
+
     if (sorted[0].date !== today && sorted[0].date !== yesterday) return 0;
-    
+
     let streak = 0;
     let checkDate = new Date(sorted[0].date);
-    
+
     // We need to iterate carefully. Convert sorted log dates to a set for O(1) lookup
     const logDates = new Set(logs.map(l => l.date));
     let current = new Date(sorted[0].date);
-    
+
     while (logDates.has(current.toISOString().split('T')[0])) {
       streak++;
       current.setDate(current.getDate() - 1);
@@ -49,6 +64,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
   const submitCheckIn = () => {
     if (showMoodModal) {
       onCheckIn(showMoodModal, moodText);
+      createParticles();
       setShowMoodModal(null);
       setMoodText('');
     }
@@ -69,7 +85,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
         <motion.div layout>
           {mainHabit ? (
             <section className="relative group">
-              <motion.div 
+              <motion.div
                 layoutId="main-habit-card"
                 className="bg-[#FCFBFC] border border-[#DBDCD7] rounded-[28px] p-8 space-y-6 paper-shadow transition-transform hover:-translate-y-1 duration-500"
               >
@@ -77,7 +93,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
                   <span className="text-4xl">{mainHabit.icon}</span>
                   <span className="text-xs bg-[#E9E8E2] text-[#726C62] px-3 py-1 rounded-full uppercase tracking-wider font-bold">Main Focus</span>
                 </div>
-                
+
                 <div className="space-y-1">
                   <h2 className="text-2xl font-serif text-[#413A2C]">{mainHabit.title}</h2>
                   <p className="text-[#726C62] text-sm">{mainHabit.description}</p>
@@ -126,7 +142,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
         <div className="grid gap-4">
           <AnimatePresence mode="popLayout">
             {secondaryHabits.length > 0 ? secondaryHabits.map((habit) => (
-              <motion.div 
+              <motion.div
                 key={habit.id}
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -154,7 +170,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
                 </button>
               </motion.div>
             )) : (
-              <motion.div 
+              <motion.div
                 layout
                 className="p-8 text-center border border-[#DBDCD7] rounded-2xl bg-[#FCFBFC]/30 italic text-[#726C62] text-sm"
               >
@@ -168,13 +184,13 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
       {/* Mood Entry Modal */}
       <AnimatePresence>
         {showMoodModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[200] flex items-center justify-center p-6"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
@@ -184,7 +200,7 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
                 <h2 className="text-2xl font-serif text-[#413A2C] italic">How are you feeling?</h2>
                 <p className="text-sm text-[#726C62]">Record a brief note for today's journey.</p>
               </div>
-              <textarea 
+              <textarea
                 autoFocus
                 value={moodText}
                 onChange={e => setMoodText(e.target.value)}
@@ -192,13 +208,13 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
                 className="w-full h-32 bg-[#E9E8E2]/50 border-none rounded-2xl px-4 py-3 focus:ring-2 focus:ring-[#66AB71]/20 outline-none text-[#413A2C] resize-none text-sm leading-relaxed"
               />
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={() => { setShowMoodModal(null); setMoodText(''); }}
                   className="flex-1 py-3 text-[#726C62] font-semibold text-sm uppercase tracking-wider"
                 >
                   Skip
                 </button>
-                <button 
+                <button
                   onClick={submitCheckIn}
                   className="flex-1 py-3 bg-[#66AB71] text-white rounded-xl font-semibold text-sm uppercase tracking-wider shadow-lg shadow-[#66AB71]/20"
                 >
@@ -209,6 +225,30 @@ const Home: React.FC<HomeProps> = ({ habits, onCheckIn }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Celebration Effects */}
+      <div className="fixed inset-0 pointer-events-none z-[300] overflow-hidden">
+        <AnimatePresence>
+          {particles.map(particle => (
+            <motion.div
+              key={particle.id}
+              initial={{ opacity: 1, x: '50vw', y: '50vh', scale: 0 }}
+              animate={{
+                opacity: 0,
+                x: `calc(50vw + ${particle.x}px)`,
+                y: `calc(50vh + ${particle.y}px)`,
+                scale: [0, 1.5, 1],
+                rotate: [0, 180, 360]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute text-2xl -translate-x-1/2 -translate-y-1/2"
+            >
+              {particle.emoji}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

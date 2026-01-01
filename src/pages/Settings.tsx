@@ -170,10 +170,6 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
             <span className="text-[#413A2C] font-mono text-xs">{import.meta.env.VITE_APP_VERSION}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-[#726C62] font-medium uppercase tracking-widest text-[9px]">Release</span>
-            <span className="text-[#413A2C] text-xs">Spring '25 Edition</span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
             <span className="text-[#726C62] font-medium uppercase tracking-widest text-[9px]">Repository</span>
             <a
               href="https://github.com/heerheer/tracker"
@@ -187,7 +183,7 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
         </div>
 
         <div className="pt-2 text-center">
-          <p className="text-[9px] text-[#726C62] uppercase tracking-[0.2em]">Designed with love & intention</p>
+          <p className="text-[9px] text-[#726C62] uppercase tracking-[0.2em]">Waiting for the settling, the lingering, and the fading, until it is a regret no more.</p>
         </div>
       </div>
     </div>
