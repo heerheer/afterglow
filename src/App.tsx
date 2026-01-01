@@ -38,35 +38,36 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('home');
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const storedHabits = await getAllHabits();
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const storedHabits = await getAllHabits();
 
-        if (storedHabits.length > 0) {
-          setHabits(storedHabits);
+      if (storedHabits.length > 0) {
+        setHabits(storedHabits);
+      } else {
+        // Check for legacy localStorage data
+        const legacyData = localStorage.getItem(STORAGE_KEY);
+        if (legacyData) {
+          const parsed = JSON.parse(legacyData);
+          setHabits(parsed);
+          await saveAllHabits(parsed);
+          // Optionally clear localStorage after migration
+          // localStorage.removeItem(STORAGE_KEY);
         } else {
-          // Check for legacy localStorage data
-          const legacyData = localStorage.getItem(STORAGE_KEY);
-          if (legacyData) {
-            const parsed = JSON.parse(legacyData);
-            setHabits(parsed);
-            await saveAllHabits(parsed);
-            // Optionally clear localStorage after migration
-            // localStorage.removeItem(STORAGE_KEY);
-          } else {
-            setHabits(INITIAL_HABITS);
-            await saveAllHabits(INITIAL_HABITS);
-          }
+          setHabits(INITIAL_HABITS);
+          await saveAllHabits(INITIAL_HABITS);
         }
-      } catch (error) {
-        console.error('Failed to load habits from IndexedDB:', error);
-        setHabits(INITIAL_HABITS);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Failed to load habits from IndexedDB:', error);
+      setHabits(INITIAL_HABITS);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -172,7 +173,7 @@ const App: React.FC = () => {
               onUpdateMood={updateMood}
             />
           )}
-          {activeTab === 'settings' && <Settings />}
+          {activeTab === 'settings' && <Settings habits={habits} onRefresh={loadData} />}
         </motion.div>
       </AnimatePresence>
     );
