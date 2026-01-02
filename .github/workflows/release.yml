@@ -9,6 +9,9 @@ on:
       tag:
         description: 'Release tag, with v prefix'
         required: true
+        
+permissions:
+  contents: write
 
 jobs:
   build:
