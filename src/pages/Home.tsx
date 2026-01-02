@@ -92,7 +92,7 @@ const Home = ({ habits, onCheckIn }: HomeProps) => {
   };
 
   return (
-    <div className="space-y-4 md:space-y-12">
+    <div className="space-y-4 md:space-y-8">
       <header className="space-y-1 px-1">
         <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">
           {new Intl.DateTimeFormat(getSafeLanguage(i18n.language), { weekday: 'long' }).format(new Date())}

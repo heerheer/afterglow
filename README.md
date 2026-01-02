@@ -9,8 +9,22 @@ Waiting for the settling, the lingering, and the fading, until it is a regret no
 
 > 这首歌关于一个庆祝，庆祝什么呢，庆祝我们的遗憾，此时此刻我们是被我们过往所有的经历堆叠而成的，包括艰难的时刻，所以让我们点起火把。
 >
-> ———— 《当我们点起火把》
+> ———— 《当我们点起火把》 DOUDOU
 </div>
+
+## Download
+
+### Web
+
+
+### Mobile
+
+Android: 
+
+- In our releases: https://github.com/heerheer/afterglow/releases
+
+No iOS version now.
+
 
 ## UI
 
@@ -51,10 +65,28 @@ You can use your own CORS-Proxy to bypass browser restrictions when connecting t
 - **Quick Backup**: Accessible quick backup button in the navigation for instant data protection.(WIP)
 
 
+### Widgets
+
+- **Heatmap**: Display the frequency of your activities over the past N days.
+- **Quote**: Display a random quote from Hitokoto/thequoteshub.
+- **Countdown**: Display a countdown to a specific date.
+
+
 ### Share
 WIP
 ### Supervision
 WIP
+
+## Data Proivider
+
+In future, we will support more data providers.
+
+- [X] Local Indexed DB
+- [ ] Supabase API/DB
+- [ ] Self-Host API/DB , use Bun/Elysia.js and MongoDB/SQLite to build
+- [ ] Cloudflare Workers API/DB 
+
+
 ## Roadmap
 
 - [x] Record!

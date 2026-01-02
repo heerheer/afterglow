@@ -48,6 +48,9 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
     <div className="space-y-8 animate-in fade-in duration-500 pb-8">
       <h1 className="text-3xl font-serif italic text-foreground">{t('settings.title')}</h1>
 
+
+
+
       <WebDAVSettings habits={habits} onRefresh={onRefresh} />
 
       <div className="bg-card border border-border rounded-[28px] p-8 paper-shadow space-y-6">
@@ -214,6 +217,7 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
           <p className="text-[9px] text-muted-foreground uppercase tracking-[0.2em]">{t('settings.quote-footer')}</p>
         </div>
       </div>
+
     </div>
   );
 };

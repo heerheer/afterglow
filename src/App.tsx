@@ -184,7 +184,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col pb-32 pt-12">
-      <main className="flex-1 max-w-md mx-auto w-full px-6  overflow-x-hidden">
+      <main className="flex-1 max-w-md mx-auto w-full  px-6  overflow-x-hidden">
         {renderContent()}
       </main>
       <Dock activeTab={activeTab} setActiveTab={setActiveTab} habits={habits} />
