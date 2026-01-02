@@ -71,13 +71,12 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
 
-
       #  对 APK 进行签名
       - uses: ilharp/sign-android-release@v2 # Or use @nightly
         name: Sign app APK
         id: sign_app
         with:
-          releaseDir: app/build/outputs/apk/release
+          releaseDir: android/app/build/outputs/apk/release
           signingKey: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
