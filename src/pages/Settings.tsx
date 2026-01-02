@@ -181,10 +181,10 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-[28px] p-8 paper-shadow space-y-8">
-        <div className="space-y-4 text-center py-4">
-          <div className="w-16 h-16 bg-secondary rounded-[24px] mx-auto flex items-center justify-center paper-shadow border border-white">
-            <FlameTorchIcon className="text-primary w-12 h-12" />
+      <div className="bg-card border border-border rounded-[28px] p-8 paper-shadow space-y-4 md:space-y-8">
+        <div className="space-y-4 text-center py-2 md:py-4">
+          <div className="w-16 h-16  rounded-[24px] mx-auto flex items-center justify-center">
+            <img src="/afterglow.png" alt="Afterglow" className="w-full h-full" />
           </div>
           <div>
             <h2 className="text-lg font-serif text-foreground">{t('settings.app-name')}</h2>
@@ -192,7 +192,7 @@ const Settings: React.FC<SettingsProps> = ({ habits, onRefresh }) => {
           </div>
         </div>
 
-        <div className="border-t border-border pt-6 space-y-3">
+        <div className="border-t border-border pt-2  md:pt-6 space-y-3">
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground font-medium uppercase tracking-widest text-[9px]">{t('settings.version')}</span>
             <span className="text-foreground font-mono text-xs">{import.meta.env.VITE_APP_VERSION}</span>

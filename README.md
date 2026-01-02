@@ -1,5 +1,5 @@
 <div align="center">
-<img width="100" height="100" alt="GHBanner" src="public/logo.svg" />
+<img width="100" height="100" alt="GHBanner" src="public/afterglow.png" />
 
 English | [简体中文](README_zh.md)
 
