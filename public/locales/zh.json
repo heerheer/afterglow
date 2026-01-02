@@ -96,6 +96,7 @@
         "lang-en": "English",
         "lang-zh": "中文",
         "language": "显示语言",
+        "new-version-available": "发现新的版本，可以前往 GitHub 更新",
         "quote-footer": "静候一场沉淀、驻足、与弥散，直至遗憾，皆成释然。",
         "repository": "源码仓库",
         "title": "设置",
