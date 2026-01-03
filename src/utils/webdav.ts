@@ -1,4 +1,6 @@
 
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
+
 export interface WebDAVConfig {
     url: string;
     username: string;
@@ -32,10 +34,33 @@ const getFetchOptions = (config: WebDAVConfig, method: string, headers: Record<s
 };
 
 const getWrappedUrl = (config: WebDAVConfig, targetUrl: string) => {
+    if (Capacitor.isNativePlatform()) {
+        return targetUrl;
+    }
     if (config.useProxy && config.proxyUrl) {
         return `${config.proxyUrl}${encodeURIComponent(targetUrl)}`;
     }
     return targetUrl;
+};
+
+const customFetch = async (url: string, options: any) => {
+    if (Capacitor.isNativePlatform()) {
+        const response = await CapacitorHttp.request({
+            url,
+            method: options.method || 'GET',
+            headers: options.headers,
+            data: options.body,
+        });
+
+        return {
+            ok: response.status >= 200 && response.status < 300,
+            status: response.status,
+            statusText: response.status.toString(),
+            json: async () => response.data,
+            text: async () => typeof response.data === 'string' ? response.data : JSON.stringify(response.data),
+        };
+    }
+    return fetch(url, options);
 };
 
 const ensureDirectory = async (config: WebDAVConfig) => {
@@ -43,12 +68,12 @@ const ensureDirectory = async (config: WebDAVConfig) => {
     const targetUrl = `${baseUrl}/afterglow/`;
     const url = getWrappedUrl(config, targetUrl);
 
-    const response = await fetch(url, {
+    const response = await customFetch(url, {
         ...getFetchOptions(config, 'MKCOL'),
     });
 
     if (response.status === 405) return;
-    if (!response.ok) throw new Error(`Failed to create directory: ${response.statusText}`);
+    if (!response.ok) throw new Error(`Failed to create directory: ${response.status}`);
 };
 
 export const backupToWebDAV = async (config: WebDAVConfig, data: any) => {
@@ -61,11 +86,11 @@ export const backupToWebDAV = async (config: WebDAVConfig, data: any) => {
     const targetUrl = `${baseUrl}/afterglow/${filename}`;
     const url = getWrappedUrl(config, targetUrl);
 
-    const response = await fetch(url, {
+    const response = await customFetch(url, {
         ...getFetchOptions(config, 'PUT', { 'Content-Type': 'application/json' }, data),
     });
 
-    if (!response.ok) throw new Error(`Backup failed: ${response.statusText}`);
+    if (!response.ok) throw new Error(`Backup failed: ${response.status}`);
 };
 
 export const listBackups = async (config: WebDAVConfig): Promise<string[]> => {
@@ -73,14 +98,14 @@ export const listBackups = async (config: WebDAVConfig): Promise<string[]> => {
     const targetUrl = `${baseUrl}/afterglow/`;
     const url = getWrappedUrl(config, targetUrl);
 
-    const response = await fetch(url, {
+    const response = await customFetch(url, {
         ...getFetchOptions(config, 'PROPFIND', {
             'Depth': '1',
             'Content-Type': 'application/xml'
         }),
     });
 
-    if (!response.ok) throw new Error(`Failed to list backups: ${response.statusText}`);
+    if (!response.ok) throw new Error(`Failed to list backups: ${response.status}`);
 
     const text = await response.text();
     const parser = new DOMParser();
@@ -102,13 +127,13 @@ export const restoreFromWebDAV = async (config: WebDAVConfig, filename: string) 
     const targetUrl = `${baseUrl}/afterglow/${filename}`;
     const url = getWrappedUrl(config, targetUrl);
 
-    const response = await fetch(url, {
+    const response = await customFetch(url, {
         ...getFetchOptions(config, 'GET'),
     });
 
     if (!response.ok) {
         if (response.status === 404) throw new Error('Backup file not found on server.');
-        throw new Error(`Restore failed: ${response.statusText}`);
+        throw new Error(`Restore failed: ${response.status}`);
     }
 
     return response.json();
@@ -119,11 +144,11 @@ export const deleteBackup = async (config: WebDAVConfig, filename: string) => {
     const targetUrl = `${baseUrl}/afterglow/${filename}`;
     const url = getWrappedUrl(config, targetUrl);
 
-    const response = await fetch(url, {
+    const response = await customFetch(url, {
         ...getFetchOptions(config, 'DELETE'),
     });
 
     if (!response.ok) {
-        throw new Error(`Delete failed: ${response.statusText}`);
+        throw new Error(`Delete failed: ${response.status}`);
     }
 };
